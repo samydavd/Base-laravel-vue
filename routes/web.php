@@ -1,7 +1,5 @@
 <?php
 
-use Illuminate\Support\Facades\Route;
-
 /*
 |--------------------------------------------------------------------------
 | Web Routes
@@ -23,8 +21,6 @@ Route::namespace('Auth')->group(function () {
 	Route::post('login', 'LoginController@login')->name('login');
 	Route::get('logout', 'LoginController@logout')->name('logout');    
 });
-
-//Auth::routes();
 
 // RUTAS CON PERMISOS
 

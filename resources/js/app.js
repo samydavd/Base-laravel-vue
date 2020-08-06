@@ -14,8 +14,8 @@ let basePath = '/',
 
 if (process.env.NODE_ENV == 'production') {
     basePath = '/';
-    app_name = 'Ejemplo';
-    base_url = 'http://ejemplo.com';
+    app_name = 'Target-app';
+    base_url = 'http://targetapp.com';
 }
 
 // IMPORTANDO DEPENDENCIAS
@@ -70,82 +70,6 @@ const app = new Vue({
     },
     methods: {
         /**
-         * Obtiene los permisos de la ruta indicada
-         * @param  {String} ruta Ruta del menú en la base de datos
-         * @return {object}      Acciones permitidas
-         */
-        permissions: async function(ruta) {
-            let acciones = {},
-                request = new FormData;
-            request.append('ruta', ruta);
-
-            await axios.post(this.base_url + '/permissions', request)
-            .then((response) => {
-                acciones = response.data;
-            });
-
-            return acciones;
-        },
-        /**
-         * Genera objeto query para router-link
-         * @param  {Object} filters Filtros
-         * @return {Object}         Query
-         */
-        query: async function(filters) {
-            let query = {};
-
-            for (var key in filters) {
-                if (['array', 'object'].indexOf(typeof filters[key]) > -1) {
-                    if (this.isset(filters[key], 'id')) {
-                        query[key] = filters[key].id;
-                    }
-                    else if (this.isset(filters[key], 'value')) {
-                        query[key] = filters[key].value;
-                    }
-                }
-                else if (['string', 'number'].indexOf(typeof filters[key]) > -1 && filters[key]) {
-                    query[key] = filters[key];
-                }
-            }
-
-            return query;
-        },
-        /**
-         * Genera un string de la query de la ruta
-         * @param  {Object}  query       [filters || $route.query]
-         * @param  {Boolean} fromFilters Indica si la query viene de filtros o de la ruta
-         * @param  {Boolean} withPage    Indica si se debe quitar la consulta por página o no
-         * @return {String}
-         */
-        queryString: async function(query, fromFilters = false, withPage = true) {
-            let array = [];
-
-            // convertir el objeto filtro en un objeto de query
-            if (fromFilters) {
-                query = await this.query(query);
-            }
-
-            // quitar parámetro de página
-            if (!withPage && typeof query.page !== 'undefined') {
-                delete query.page;
-            }
-
-            for (var key in query) {
-                array.push(key + '=' + query[key]);
-            }
-
-            return array.length > 0 ? '?' + array.join('&') : '';
-        },
-        /**
-         * Retorna el texto enviado dentro del parametro de maxima longitud
-         * @param  {String} text             Texto a reducir
-         * @param  {String} max_length       Largo maximo
-         * @return {Object}                  Texto reducido al largo indicado
-         */
-        trimEllip: function (text, max_length) {
-            return text.length > max_length ? text.substring(0, max_length) + "..." : text;
-        },
-        /**
          * Retorna el objeto filtros con los parámetros seteados a corde a la query de la url
          * @param  {Object} filters       Objeto "filtros" de la vista
          * @param  {Array}  selects       Arreglo "selectores" de la vista con objetos
@@ -173,37 +97,6 @@ const app = new Vue({
             }
 
             return filters;
-        },
-        /**
-         * Genera URL de descarga de archivo
-         * @param  {[type]} file_route ruta del archivo dentro de public
-         * @param  {Number} [type=1]   indica si se imprime (I) o descarga
-         * @param  {String} [name='']  nombre del archivo a descargar
-         * @return {String} URL
-         */
-        downloadRoute: function(file_route, type = 'I', name = null) {
-            return this.base_url + '/download/public/' + btoa(file_route) + '/' + type + (name ? '/' + name : '');
-        },
-        /**
-         * Fija un tiempo para ejecuciones consecutivas de una función
-         * @param  {Callback} Función a retrasar
-         * @param  {Numeric} Tiempo de retraso en microsegundos
-         * @param  {Boolean} Llamada inmediata de la función
-         * @return {Callback} Función con el tiempo de retraso de ejecución
-         */
-        debounce(func, wait, immediate) {
-            var timeout;
-            return function() {
-                var context = this, args = arguments;
-                var later = function() {
-                    timeout = null;
-                    if (!immediate) func.apply(context, args);
-                };
-                var callNow = immediate && !timeout;
-                clearTimeout(timeout);
-                timeout = setTimeout(later, wait);
-                if (callNow) func.apply(context, args);
-            };
         },
         /**
          * Valida si variables existen dentro del objeto
@@ -259,17 +152,6 @@ const app = new Vue({
         swalResponse: function(response) {
             let array = this.arrayResponse(response);
             return array.join('<br />');
-        },
-        cargando(title = 'Cargando, por favor espere...'){
-            Swal.fire({
-                title : title ,
-                timerProgressBar: true,
-                allowOutsideClick : false,
-                allowEscapeKey : false,
-                onBeforeOpen: () => {
-                    Swal.showLoading()
-                }
-            })
         },
         stop(){
             if(document.querySelector('.swal2-container')){
